@@ -1,4 +1,5 @@
 const score = document.querySelector(".score");
+const lives = document.querySelector(".lives");
 const startScreen = document.querySelector(".startScreen");
 const gameArea = document.querySelector(".gameArea");
 
@@ -7,6 +8,7 @@ document.addEventListener("keyup", keyUp);
 
 let player = {
     speed: 5,
+    lives: 3,
 };
 
 startScreen.addEventListener("click", startGame);
@@ -56,6 +58,7 @@ function gamePlay() {
         player.score++;
 
         score.innerHTML = "Score: " + player.score;
+        lives.innerHTML = "Lives: " + player.lives;
     }
 }
 function moveLines() {
@@ -85,7 +88,14 @@ function moveEnemyCar(car) {
     let enemyCars = document.querySelectorAll(".enemyCar");
     enemyCars.forEach((enemyCar, index) => {
         if (isCollide(car, enemyCar)) {
-            endGame();
+            player.lives--;
+            if (player.lives <= 0) {
+                endGame();
+            } else {
+                // Reset enemy car position after collision
+                enemyCar.y = -300;
+                enemyCar.style.left = Math.floor(Math.random() * 350) + "px";
+            }
         }
 
         if (enemyCar.y >= 750) {
@@ -99,11 +109,13 @@ function moveEnemyCar(car) {
 
 function startGame() {
     score.classList.remove("hide");
+    lives.classList.remove("hide");
     startScreen.classList.add("hide");
     gameArea.innerHTML = "";
 
     player.start = true;
     player.score = 0;
+    player.lives = 3;
     window.requestAnimationFrame(gamePlay);
 
     for (let i = 0; i < 5; i++) {
@@ -127,7 +139,8 @@ function startGame() {
         enemyCar.setAttribute("class", "enemyCar");
         enemyCar.y = (i + 1) * 350 * -1;
         enemyCar.style.top = enemyCar.y + "px";
-        enemyCar.style.backgroundImage = `url("./images/car${i + 1}.png")`;
+        let randomCarNum = Math.floor(Math.random() * 5) + 1;
+        enemyCar.style.backgroundImage = `url("./images/car${randomCarNum}.png")`;
         enemyCar.style.left = Math.floor(Math.random() * 350) + "px";
         gameArea.appendChild(enemyCar);
     }
